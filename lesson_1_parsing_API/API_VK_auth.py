@@ -10,6 +10,7 @@ params = {'access_token': token,
           'v':'5.103',
           'owner_id': '1'
 }
+
 response = requests.get(main_url, headers=header, params=params)
 
 if response.ok:
