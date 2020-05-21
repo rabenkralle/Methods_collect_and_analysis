@@ -12,6 +12,7 @@ import json
 client = MongoClient('localhost', 27017)        #Подключается БД
 db = client['vacancy_db']
 vacancies = db.vacancy
+salary = int(input('Введите минимальную интересующую сумму: '))
 
 class Mongodb_fill():                           #Класс для заполнения БД, обновления и вывода информации согласно параметрам
 
@@ -41,8 +42,8 @@ class Mongodb_fill():                           #Класс для заполн�
                 vacancies.insert_one(item)
 
     @classmethod
-    def show_vacancy_params(cls):               #Выборка вакансий с ЗП больше 185000 в рублях
-        for vacancy in vacancies.find({'$and':[{'$or': [{'min_salary': {'$gte': 185000}, 'max_salary': {'$gte': 185000}}]},{'currency':'руб.'}]}):
+    def show_vacancy_params(cls):               #Выборка вакансий с ЗП больше указанной пользователем в рублях
+        for vacancy in vacancies.find({'$and':[{'$or': [{'min_salary': {'$gte': salary}, 'max_salary': {'$gte': salary}}]},{'currency':'руб.'}]}):
             pprint(vacancy)
 
 
@@ -52,7 +53,7 @@ def main():                                     #Запуск программы
     print('Добавленные вакансии:')
     db_update.vacancy_updater()
     print('--------------------')
-    print('Вакансии с зарплатой выше 185000 рублей: ')
+    print(f'Вакансии с зарплатой выше {salary} рублей: ')
     db_update.show_vacancy_params()
 
 main()
