@@ -115,7 +115,9 @@ class Scrapper():       #Создаем класс для сбора новос�
         news.extend(lenta_news)
         news.extend(mail_news)
         return news
+
 '''Создаем базу для переноса новостей в SQLite'''
+
 engine = create_engine('sqlite:///news.db',echo=True)
 Base = declarative_base()
 

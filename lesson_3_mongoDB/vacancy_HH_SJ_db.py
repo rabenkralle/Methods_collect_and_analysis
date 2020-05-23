@@ -32,14 +32,9 @@ class Mongodb_fill():                           #Класс для заполн�
         vacancy_full = cls.get_vacancy()
         cls.fill_first_db(vacancy_full)
 
-        vacancydb_list = []
-        for vacancy in vacancies.find({}, {'_id': 0}):
-            vacancydb_list.append(vacancy)
-
         for item in vacancy_full:
-            if item not in vacancydb_list:
-                pprint(item)
-                vacancies.insert_one(item)
+            vacancies.update_one({'link': item['link']}, {'$set': item}, upsert=True)
+
 
     @classmethod
     def show_vacancy_params(cls):               #Выборка вакансий с ЗП больше указанной пользователем в рублях
@@ -49,10 +44,7 @@ class Mongodb_fill():                           #Класс для заполн�
 
 def main():                                     #Запуск программы
     db_update = Mongodb_fill()
-    print('--------------------')
-    print('Добавленные вакансии:')
     db_update.vacancy_updater()
-    print('--------------------')
     print(f'Вакансии с зарплатой выше {salary} рублей: ')
     db_update.show_vacancy_params()
 
