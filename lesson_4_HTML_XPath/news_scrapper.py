@@ -135,18 +135,21 @@ class News(Base):                       #класс для создания ст
         self.source = source
         self.time = time
 
-Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
+def main():
 
-sc = Scrapper()
-session = Session()
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine)
 
-for article in sc.all_news():                               #Заполняем БД данными
-    session.add(News(article['Title'], article['Link'], article['Source'], article['Time']))
+    sc = Scrapper()
+    session = Session()
 
-for instance in session.query(News).filter():                  #Смотрим, что есть в БД
-    print(instance.title, instance.source, instance.time, instance.link)
+    for article in sc.all_news():                               #Заполняем БД данными
+        session.add(News(article['Title'], article['Link'], article['Source'], article['Time']))
 
-session.commit()
-session.close()
+    for instance in session.query(News).filter():                  #Смотрим, что есть в БД
+        print(instance.title, instance.source, instance.time, instance.link)
 
+    session.commit()
+    session.close()
+
+main()
