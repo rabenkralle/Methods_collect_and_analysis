@@ -155,6 +155,3 @@ def main():
     session.close()
 
 main()
-
-# sc = Scrapper()
-# pprint(sc.parse_mail_ru())
