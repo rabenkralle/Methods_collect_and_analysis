@@ -10,9 +10,8 @@
 from lxml import html
 import requests
 import datetime
-from pprint import pprint
 from sqlalchemy import create_engine
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -51,17 +50,17 @@ class Scrapper():       #Создаем класс для сбора новос�
                 if j != info_split[-1]:
                     t = t + j + ' '
             data['Source'] = t
-            time = str(datetime.date.today()) + ' ' + info_split[-1]
-            data['Time'] = time  #К сожалению, в Яндексе указывается время без даты, потому используется библиотека datetime,                                                                     # но нет проверки, если смотришь после 0 часов, а новости предыдущим днем
+            data['Time'] = str(datetime.date.today()) + ' ' + info_split[-1]  #К сожалению, в Яндексе указывается время без даты, потому используется библиотека datetime,
+                                                                                # но нет проверки, если смотришь после 0 часов, а новости предыдущим днем
             news.append(data)
 
         return news
 
     @classmethod
     def parse_lenta_ru(cls):                #Собираем новости с сайта Лента.ру
+
         dom = cls.get_text(lentaru_link)
         news = []
-        news.append(data)
         text = dom.xpath('//div/section[contains(@class,"b-top7-for-main")]//div[contains(@class, "item")]//a[not(contains(@class, "title-pic")) and not(contains(@class, "b-favorite__item"))]/text()')
         link = dom.xpath('//div/section[contains(@class,"b-top7-for-main")]//div[contains(@class, "item")]//a[not(contains(@class, "title-pic")) and not(contains(@class, "b-favorite__item"))]/@href')
         time = dom.xpath('//div/section[contains(@class,"b-top7-for-main")]//div[contains(@class, "item")]//a[not(contains(@class, "title-pic")) and not(contains(@class, "b-favorite__item"))]/time/@datetime')
@@ -81,21 +80,16 @@ class Scrapper():       #Создаем класс для сбора новос�
         dom = cls.get_text(mailru_link)
         text = dom.xpath('//div[contains(@class, "topnews")]//div[contains(@class, "daynews")]//span/span[1]/text()')
         link = dom.xpath('//div[contains(@class, "topnews")]//div[contains(@class, "daynews")]//a/@href')
-        # link_ex = dom.xpath('//div[contains(@class, "topnews")]//div[contains(@class, "daynews")]//a[contains(@href, "mail.ru")]/@href')
-                                        #переменная link_ex нужна для проверки линка. Мейл.ру иногда выдает новости с относительной ссылкой, иногда с полной.
-        link_block = dom.xpath('//div[contains(@class, "topnews")]//div[contains(@class, "daynews")]')
         source_link = '//div[contains(@class, "breadcrumbs")]//a[contains(@class, "breadcrumbs")]/span/text()'
         time_link = '//div[contains(@class, "breadcrumbs")]//span[@datetime]/@datetime'
         news = []
 
         for i in range(len(text)):
-
             data = {}
             data['Title'] = text[i].replace('\xa0', ' ')
-            link_exception = link_block[i].xpath('.//a[contains(@href, "mail.ru")]')
             data['Link'] = mailru_link + link[i]
-            data['Source'] = cls.change_page(data['Link'], source_link)
-            data['Time'] = cls.change_page(data['Link'], time_link)
+            data['Source'] = cls.change_page(data['Link'], source_link)[0]
+            data['Time'] = cls.change_page(data['Link'], time_link)[0]
             news.append(data)
 
         return news
@@ -153,5 +147,3 @@ def main():
     session.close()
 
 main()
-sc = Scrapper()
-pprint(sc.parse_mail_ru())
