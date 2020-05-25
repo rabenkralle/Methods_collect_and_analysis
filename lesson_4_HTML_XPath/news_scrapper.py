@@ -10,19 +10,21 @@
 from lxml import html
 import requests
 import datetime
+import re
+from pprint import pprint
 from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-
+from sqlalchemy.sql import exists
 
 
 HEADER = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
           'Accept':'*/*'}
 
-mailru_link = 'https://news.mail.ru/'
+mailru_link = 'https://news.mail.ru'
 yandexru_link = 'https://yandex.ru/news/'
-lentaru_link = 'https://lenta.ru/'
+lentaru_link = 'https://lenta.ru'
 
 class Scrapper():       #Создаем класс для сбора новостей с сайтов
 
@@ -87,9 +89,12 @@ class Scrapper():       #Создаем класс для сбора новос�
         for i in range(len(text)):
             data = {}
             data['Title'] = text[i].replace('\xa0', ' ')
-            data['Link'] = mailru_link + link[i]
+            if re.match(r'mail.ru', link[i]):
+                data['Link'] = link[i]
+            else:
+                data['Link'] = mailru_link + link[i]
             data['Source'] = cls.change_page(data['Link'], source_link)[0]
-            data['Time'] = cls.change_page(data['Link'], time_link)[0]
+            data['Time'] = (cls.change_page(data['Link'], time_link)[0]).replace('T', ' ')[:-9]
             news.append(data)
 
         return news
@@ -138,7 +143,10 @@ def main():
     session = Session()
 
     for article in sc.all_news():                               #Заполняем БД данными
-        session.add(News(article['Title'], article['Link'], article['Source'], article['Time']))
+        if session.query(exists().where(News.link == article['Link'])).scalar() == True:
+            break
+        else:
+            session.add(News(article['Title'], article['Link'], article['Source'], article['Time']))
 
     for instance in session.query(News).filter():                  #Смотрим, что есть в БД
         print(instance.title, instance.source, instance.time, instance.link)
@@ -147,3 +155,6 @@ def main():
     session.close()
 
 main()
+
+# sc = Scrapper()
+# pprint(sc.parse_mail_ru())
