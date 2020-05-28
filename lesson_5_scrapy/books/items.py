@@ -12,6 +12,7 @@ class BooksItem(scrapy.Item):
     # define the fields for your item here like:
     _id = scrapy.Field()
     name = scrapy.Field()
+    link = scrapy.Field()
     book = scrapy.Field()
     author = scrapy.Field()
     old_price = scrapy.Field()

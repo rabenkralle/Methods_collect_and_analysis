@@ -21,9 +21,10 @@ class LabirintruSpider(scrapy.Spider):
 
     def book_parse(self, response: HtmlResponse):
         name = response.xpath('//h1/text()').extract()
+        link = response.url
         author = response.xpath('//div[@class = "authors"][1]/a/text()').extract()
         old_price = response.xpath('//span[@class="buying-priceold-val-number"]/text()').extract_first()
         new_price = response.xpath("//span[@class='buying-pricenew-val-number']/text()").extract_first()
         rating = response.xpath("//div[@id='rate']/text()").extract_first()
-        yield BooksItem(name = name, author = author, old_price = old_price, new_price = new_price, rating = rating)
+        yield BooksItem(name = name, link = link,  author = author, old_price = old_price, new_price = new_price, rating = rating)
 

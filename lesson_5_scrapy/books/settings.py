@@ -67,6 +67,7 @@ LOG_LEVEL = 'DEBUG'
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    'books.pipelines.BooksPipeline': 300,
+   'books.pipelines.BooksItemEditor': 200
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
