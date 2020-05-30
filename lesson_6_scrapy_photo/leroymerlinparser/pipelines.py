@@ -25,14 +25,19 @@ class LeroymerlinparserPipeline:
 class LeroymerlinItemEditor:
     def process_item(self, item, spider):
         try:
-            item['details'] = [value for value in item['details'] if value]
+            item['details'] = [value for value in item['details'] if value]     #Убираем пустые значения в списке
         except:
             pass
-        # op = {lst[i]: lst[i + 1] for i in range(0, len(lst), 2)}
-        try:
+
+        try:    #Переводим список в словарь
             item['details'] = {item['details'][i]: item['details'][i + 1] for i in range(0, len(item['details']), 2)}
         except Exception as e:
             print(e)
+
+        try:
+            item['price'] = float(item['price'])
+        except:
+            pass
 
         return item
 
@@ -44,7 +49,7 @@ class LeroymerlinPhotoPipeline(ImagesPipeline):
         if item['photo']:
             for img in item['photo']:
                 try:
-                    yield scrapy.Request(img, meta={'item': item})
+                    yield scrapy.Request(img, meta={'item': item}) #Для создания папок по имени товара, собираем meta
                 except Exception as e:
                     print(e)
 
@@ -53,10 +58,10 @@ class LeroymerlinPhotoPipeline(ImagesPipeline):
             item['photo'] = [itm[1] for itm in results if itm[0]]
         return item
 
-    def file_path(self, request, response=None, info=None):
-        item = request.meta['item']
+    def file_path(self, request, response=None, info=None): #Создаем папки
+        item = request.meta['item']         #Используя meta, вытаскиваем данные item
         name = item['name']
         url = request.url
-        media_guid = hashlib.sha1(to_bytes(url)).hexdigest()
+        media_guid = hashlib.sha1(to_bytes(url)).hexdigest()       #Формируем название файла фотографии
         media_ext = os.path.splitext(url)[1]
         return f'full/{name}/%s%s' % (media_guid, media_ext)

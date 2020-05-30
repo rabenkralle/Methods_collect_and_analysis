@@ -8,7 +8,7 @@ from scrapy.loader.processors import MapCompose, TakeFirst, Compose
 import scrapy
 
 
-def clean_list(value):
+def clean_list(value):  #Чистим details, содержащую характеристики товара
     value = value.replace('\n', '')
     try:
         value = float(''.join(filter(str.isdigit, value)))
