@@ -44,7 +44,7 @@ class LeroymerlinPhotoPipeline(ImagesPipeline):
         if item['photo']:
             for img in item['photo']:
                 try:
-                    yield scrapy.Request(img)
+                    yield scrapy.Request(img, meta={'item': item})
                 except Exception as e:
                     print(e)
 
@@ -54,9 +54,9 @@ class LeroymerlinPhotoPipeline(ImagesPipeline):
         return item
 
     def file_path(self, request, response=None, info=None):
-        # name = item['name']
-
+        item = request.meta['item']
+        name = item['name']
         url = request.url
         media_guid = hashlib.sha1(to_bytes(url)).hexdigest()
         media_ext = os.path.splitext(url)[1]
-        return 'full/%s%s' % (media_guid, media_ext)
+        return f'full/{name}/%s%s' % (media_guid, media_ext)

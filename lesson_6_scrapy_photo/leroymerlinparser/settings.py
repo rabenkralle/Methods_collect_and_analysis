@@ -69,8 +69,8 @@ COOKIES_ENABLED = True
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    'leroymerlinparser.pipelines.LeroymerlinparserPipeline': 300,
-   'leroymerlinparser.pipelines.LeroymerlinItemEditor': 200,
-   'leroymerlinparser.pipelines.LeroymerlinPhotoPipeline': 100
+   'leroymerlinparser.pipelines.LeroymerlinItemEditor': 100,
+   'leroymerlinparser.pipelines.LeroymerlinPhotoPipeline': 200
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
