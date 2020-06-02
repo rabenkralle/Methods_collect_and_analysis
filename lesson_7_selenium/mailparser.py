@@ -29,15 +29,21 @@ mails = driver.find_elements_by_class_name('js-letter-list-item')
 mail_list = []
 for mail in mails:
     mail_list.append(mail.get_attribute('href'))
-
-mail_dict = {}
+# print(mail_list)
+mail_info = []
 for click in mail_list:
+    mail_dict = {}
     driver.get(click)
-    time.sleep(5)
-    author = driver.find_element_by_xpath("//div[@class = 'letter__author']/span[@class = 'letter-contact']").text
-    author_mail = driver.find_element_by_xpath("//div[@class = 'letter__author']/span[@class = 'letter-contact']").get_attribute('title')
-    mail_text = driver.find_elements_by_xpath('//div[@class="letter__body"]//tbody//span | //div[@class="letter__body"]//tbody//td | //div[@class="letter__body"]//p')
-    print(author, author_mail, [text.text for text in mail_text])
+    elem = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'letter__author']/span[@class = 'letter-contact']")))
+    mail_dict['author'] = elem.find_element_by_xpath("//div[@class = 'letter__author']/span[@class = 'letter-contact']").text
+    mail_dict['author_mail'] = elem.find_element_by_xpath("//div[@class = 'letter__author']/span[@class = 'letter-contact']").get_attribute('title')
+    mail_dict['subject'] = elem.find_element_by_xpath("//h2[@class='thread__subject thread__subject_pony-mode']").text
+    mail_dict['date'] = elem.find_element_by_xpath('//div[@class="letter__date"]').text
+    mail_text= elem.find_elements_by_xpath('//div[@class="letter__body"]//tbody//span | //div[@class="letter__body"]//tbody//td | //div[@class="letter__body"]//p')
+    mail_dict['text'] = [text.text for text in mail_text]
+    mail_info.append(mail_dict)
+
+print(mail_info)
 # num_mails = 0
 # while num_mails < num_mail:
 #     # time.sleep(5)
@@ -49,3 +55,5 @@ for click in mail_list:
 #     actions.perform()
 
 # print(mails)
+
+driver.quit
