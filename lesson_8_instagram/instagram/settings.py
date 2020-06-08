@@ -22,6 +22,7 @@ NEWSPIDER_MODULE = 'instagram.spiders'
 ROBOTSTXT_OBEY = False
 LOG_ENABLED = True
 LOG_LEVEL = 'DEBUG'
+IMAGES_STORE = 'images'
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
 
@@ -67,6 +68,7 @@ DOWNLOAD_DELAY = 1
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    'instagram.pipelines.InstagramPipeline': 300,
+   'instagram.pipelines.InstagramProfilePhotoParser': 200
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

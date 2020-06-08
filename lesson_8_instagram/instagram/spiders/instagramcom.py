@@ -12,11 +12,14 @@ class InstagramcomSpider(scrapy.Spider):
     start_urls = ['http://instagram.com/']
     insta_login = 'rgeekmca'
     insta_pass = '#PWD_INSTAGRAM_BROWSER:10:1591357205:AeZQAABkUYvOAQ99OxiRScG5iZdt0z5KdNcvitL6qr79UOF1XnnXIYJMLuERGRxhKHmeUaJA7p9IRPklKGm6QL8quV6lVe+FX7vqGiNCegZ8wWDHpyWyCwNTm18sVPXCZYueRIbDZayMLqhg'
-    parser_user = 'rkl.shows'
     insta_login_link = 'https://www.instagram.com/accounts/login/ajax/'
 
     hash_followers = 'c76146de99bb02f6415203be841dd25a'
+    hash_following = 'd04b0a864b4b54837c0d870b0e77e076'
     graphql_link = 'https://www.instagram.com/graphql/query/?'
+
+    def __init__(self, name):
+        self.parser_user = name
 
     def parse(self, response):
         csrf_token = self.fetch_csrf_token(response.text)
@@ -55,6 +58,16 @@ class InstagramcomSpider(scrapy.Spider):
                        }
         )
 
+        url_following = f'{self.graphql_link}query_hash={self.hash_following}&{urlencode(variables)}'
+        yield response.follow(
+            url_following,
+            callback=self.following_parse,
+            cb_kwargs={'user_id': user_id,
+                       'variables': deepcopy(variables)
+                       }
+
+        )
+
 
     def followers_parse(self, response, user_id, variables):
         j_body = json.loads(response.text)
@@ -75,14 +88,44 @@ class InstagramcomSpider(scrapy.Spider):
         for follower in followers:
             item = InstagramItem(
                 followers_of=user_id,
+                name=self.parser_user,
                 id=follower['node']['id'],
                 username=follower['node']['username'],
-                fullname=follower['node']['full_name']
+                fullname=follower['node']['full_name'],
+                profile_pic=follower['node']['profile_pic_url'],
+                status='followers'
             )
 
             yield item
 
+    def following_parse(self, response, user_id, variables):
+        j_body = json.loads(response.text)
+        page_info = j_body.get('data').get('user').get('edge_follow').get('page_info')
+        if page_info['has_next_page']:
+            variables['after'] = page_info['end_cursor']
 
+            url_following = f'{self.graphql_link}query_hash={self.hash_following}&{urlencode(variables)}'
+
+            yield response.follow(
+                url_following,
+                callback=self.following_parse,
+                cb_kwargs={'user_id': user_id,
+                           'variables': deepcopy(variables)}
+            )
+
+        followers = j_body.get('data').get('user').get('edge_follow').get('edges')
+        for follower in followers:
+            item = InstagramItem(
+                followed_by=user_id,
+                name=self.parser_user,
+                id=follower['node']['id'],
+                username=follower['node']['username'],
+                fullname=follower['node']['full_name'],
+                profile_pic=follower['node']['profile_pic_url'],
+                status='followed_by'
+            )
+
+            yield item
     def fetch_csrf_token(self, text):
         matched = re.search('\"csrf_token\":\"\\w+\"', text).group()
         return matched.split(':').pop().replace(r'"', '')
