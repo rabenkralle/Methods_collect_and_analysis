@@ -10,8 +10,8 @@ class InstagramcomSpider(scrapy.Spider):
     name = 'instagramcom'
     allowed_domains = ['instagram.com']
     start_urls = ['http://instagram.com/']
-    insta_login = 'rgeekmca'
-    insta_pass = '#PWD_INSTAGRAM_BROWSER:10:1591357205:AeZQAABkUYvOAQ99OxiRScG5iZdt0z5KdNcvitL6qr79UOF1XnnXIYJMLuERGRxhKHmeUaJA7p9IRPklKGm6QL8quV6lVe+FX7vqGiNCegZ8wWDHpyWyCwNTm18sVPXCZYueRIbDZayMLqhg'
+    insta_login = ''
+    insta_pass = ''
     insta_login_link = 'https://www.instagram.com/accounts/login/ajax/'
 
     hash_followers = 'c76146de99bb02f6415203be841dd25a'
